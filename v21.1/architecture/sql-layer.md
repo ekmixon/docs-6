@@ -4,7 +4,14 @@ summary: The SQL layer of CockroachDB's architecture exposes its SQL API to deve
 toc: true
 ---
 
-The SQL layer of CockroachDB's architecture exposes its SQL API to developers and converts SQL statements into key-value operations used by the rest of the database.
+The SQL layer of CockroachDB's architecture exposes SQL API to developers and converts high-level [SQL statements](../{{page.version.version}}/sql-statements.html) into low-level read and write requests to the underlying key-value store, which are passed to the [Transaction Layer](transaction-layer.html)
+
+Specifically, it consists of the following sublayers:
+
+- [SQL API](#sql-api), which forms the user interface.
+- [Parser](#parsing), which converts SQL text into an abstract syntax tree (AST)
+- [Cost-based optimizer](#logical-planning), which converts the AST into an optimized logical query plan
+- [SQL execution engine](#physical-planning), which converts the logical query plan into a physical query plan for execution by the nodes in the cluster
 
 {{site.data.alerts.callout_info}}
 If you haven't already, we recommend reading the [Architecture Overview](overview.html).
@@ -12,37 +19,40 @@ If you haven't already, we recommend reading the [Architecture Overview](overvie
 
 ## Overview
 
-Once CockroachDB has been deployed, developers need nothing more than a connection string to the cluster and SQL statements to start working.
+Once CockroachDB has been deployed, developers need only a [connection string](../{{page.version.version}}/connection-parameters.html) to the cluster, and they can start working with SQL statements.
 
-Because CockroachDB's nodes all behave symmetrically, developers can send requests to any node (which means CockroachDB works well with load balancers). Whichever node receives the request acts as the "gateway node," as other layers process the request.
+Because each node in a CockroachDB cluster behaves symmetrically, developers can send requests to any node (which means CockroachDB works well with load balancers). Whichever node receives the request acts as the "gateway node," which processes the request and responds to the client.
 
-When developers send requests to the cluster, they arrive as SQL statements, but data is ultimately written to and read from the storage layer as key-value (KV) pairs. To handle this, the SQL layer converts SQL statements into a plan of KV operations, which it passes along to the transaction layer.
+Requests to the cluster arrive as SQL statements, but data is ultimately written to and read from the [storage layer](storage-layer.html) as key-value (KV) pairs. To handle this, the SQL layer converts SQL statements into a plan of KV operations, which it then passes along to the [transaction layer](transaction-layer.html).
 
 ### Interactions with other layers
 
 In relationship to other layers in CockroachDB, the SQL layer:
 
-- Sends requests to the transaction layer.
+- Receives requests from the outside world via its SQL API
+- Converts SQL into low-level KV operations, which it sends as requests to the [transaction layer](transaction-layer.html).
 
 ## Components
 
 ### Relational structure
 
-Developers experience data stored in CockroachDB in a relational structure, i.e., rows and columns. Sets of rows and columns are organized into tables. Collections of tables are organized into databases. Your cluster can contain many databases.
+Developers experience data stored in CockroachDB in a relational structure comprised of rows and columns. Sets of rows and columns are further organized into [tables](../{{page.version.version}}/show-tables.html). Collections of tables are then organized into [databases](../{{page.version.version}}/show-databases.html). A CockroachDB cluster can contain many databases.
 
-Because of this structure, CockroachDB provides typical relational features like constraints (e.g., foreign keys). This lets application developers trust that the database will ensure consistent structuring of the application's data; data validation doesn't need to be built into the application logic separately.
+Because of this structure, CockroachDB provides typical relational features like [constraints](../{{page.version.version}}/constraints.html) (e.g., [foreign keys](../{{page.version.version}}/foreign-key.html)). These features mean that application developers can trust that the database will ensure consistent structuring of the application's data; data validation doesn't need to be built into the application logic separately.
 
 ### SQL API
 
-CockroachDB implements a large portion of the ANSI SQL standard to manifest its relational structure. You can view [all of the SQL features CockroachDB supports here](../sql-feature-support.html).
+CockroachDB implements most of the ANSI SQL standard to manifest its relational structure. For a complete list of the SQL features CockroachDB supports, see [SQL Feature Support](../{{page.version.version}}/sql-feature-support.html).
 
-Importantly, through the SQL API, we also let developers use ACID-semantic transactions like they would through any SQL database (`BEGIN`, `END`, `COMMIT`, etc.)
+Importantly, through the SQL API, developers have access to ACID-semantic [transactions](../{{page.version.version}}/transactions.html) like they would through any SQL database (using [`BEGIN`](../{{page.version.version}}/begin-transaction.html), [`END`](../{{page.version.version}}/end-transaction.html), [`COMMIT`](../{{page.version.version}}/commit-transaction.html), etc.)
+
+XXX: YOU ARE HERE
 
 ### PostgreSQL wire protocol
 
 SQL queries reach your cluster through the PostgreSQL wire protocol. This makes connecting your application to the cluster simple by supporting most PostgreSQL-compatible drivers, as well as many PostgreSQL ORMs, such as GORM (Go) and Hibernate (Java).
 
-### SQL parser, planner, executor
+### SQL parser, optimizer, execution engine
 
 After your node ultimately receives a SQL request from a client, CockroachDB parses the statement, [creates a query plan](../cost-based-optimizer.html), and then executes the plan.
 
