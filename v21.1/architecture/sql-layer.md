@@ -4,7 +4,7 @@ summary: The SQL layer of CockroachDB's architecture exposes its SQL API to deve
 toc: true
 ---
 
-The SQL layer of CockroachDB's architecture exposes SQL API to developers and converts high-level [SQL statements](../{{page.version.version}}/sql-statements.html) into low-level read and write requests to the underlying key-value store, which are passed to the [Transaction Layer](transaction-layer.html)
+The SQL layer of CockroachDB's architecture exposes SQL API to developers and converts high-level [SQL statements](../sql-statements.html) into low-level read and write requests to the underlying key-value store, which are passed to the [Transaction Layer](transaction-layer.html)
 
 Specifically, it consists of the following sublayers:
 
@@ -19,7 +19,7 @@ If you haven't already, we recommend reading the [Architecture Overview](overvie
 
 ## Overview
 
-Once CockroachDB has been deployed, developers need only a [connection string](../{{page.version.version}}/connection-parameters.html) to the cluster, and they can start working with SQL statements.
+Once CockroachDB has been deployed, developers need only a [connection string](../connection-parameters.html) to the cluster, and they can start working with SQL statements.
 
 Because each node in a CockroachDB cluster behaves symmetrically, developers can send requests to any node (which means CockroachDB works well with load balancers). Whichever node receives the request acts as the "gateway node," which processes the request and responds to the client.
 
@@ -36,15 +36,15 @@ In relationship to other layers in CockroachDB, the SQL layer:
 
 ### Relational structure
 
-Developers experience data stored in CockroachDB in a relational structure comprised of rows and columns. Sets of rows and columns are further organized into [tables](../{{page.version.version}}/show-tables.html). Collections of tables are then organized into [databases](../{{page.version.version}}/show-databases.html). A CockroachDB cluster can contain many databases.
+Developers experience data stored in CockroachDB in a relational structure comprised of rows and columns. Sets of rows and columns are further organized into [tables](../show-tables.html). Collections of tables are then organized into [databases](../show-databases.html). A CockroachDB cluster can contain many databases.
 
-Because of this structure, CockroachDB provides typical relational features like [constraints](../{{page.version.version}}/constraints.html) (e.g., [foreign keys](../{{page.version.version}}/foreign-key.html)). These features mean that application developers can trust that the database will ensure consistent structuring of the application's data; data validation doesn't need to be built into the application logic separately.
+Because of this structure, CockroachDB provides typical relational features like [constraints](../constraints.html) (e.g., [foreign keys](../foreign-key.html)). These features mean that application developers can trust that the database will ensure consistent structuring of the application's data; data validation doesn't need to be built into the application logic separately.
 
 ### SQL API
 
-CockroachDB implements most of the ANSI SQL standard to manifest its relational structure. For a complete list of the SQL features CockroachDB supports, see [SQL Feature Support](../{{page.version.version}}/sql-feature-support.html).
+CockroachDB implements most of the ANSI SQL standard to manifest its relational structure. For a complete list of the SQL features CockroachDB supports, see [SQL Feature Support](../sql-feature-support.html).
 
-Importantly, through the SQL API, developers have access to ACID-semantic [transactions](../{{page.version.version}}/transactions.html) like they would through any SQL database (using [`BEGIN`](../{{page.version.version}}/begin-transaction.html), [`END`](../{{page.version.version}}/end-transaction.html), [`COMMIT`](../{{page.version.version}}/commit-transaction.html), etc.)
+Importantly, through the SQL API, developers have access to ACID-semantic [transactions](../transactions.html) like they would through any SQL database (using [`BEGIN`](../begin-transaction.html), [`COMMIT`](../commit-transaction.html), etc.).
 
 XXX: YOU ARE HERE
 
@@ -52,7 +52,7 @@ XXX: YOU ARE HERE
 
 SQL queries reach your cluster through the PostgreSQL wire protocol. This makes connecting your application to the cluster simple by supporting most PostgreSQL-compatible drivers, as well as many PostgreSQL ORMs, such as GORM (Go) and Hibernate (Java).
 
-### SQL parser, optimizer, execution engine
+### SQL parser, planner, executor
 
 After your node ultimately receives a SQL request from a client, CockroachDB parses the statement, [creates a query plan](../cost-based-optimizer.html), and then executes the plan.
 
