@@ -79,8 +79,7 @@ run_transaction(sessionmaker(bind=engine),
 # Helper for getting random existing account IDs.
 
 def get_random_account_id():
-    id = random.choice(tuple(seen_account_ids))
-    return id
+    return random.choice(tuple(seen_account_ids))
 
 
 def transfer_funds_randomly(session):

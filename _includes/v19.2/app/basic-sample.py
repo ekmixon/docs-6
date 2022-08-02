@@ -11,17 +11,17 @@ def create_accounts(conn):
     with conn.cursor() as cur:
         cur.execute('CREATE TABLE IF NOT EXISTS accounts (id INT PRIMARY KEY, balance INT)')
         cur.execute('UPSERT INTO accounts (id, balance) VALUES (1, 1000), (2, 250)')
-        logging.debug("create_accounts(): status message: {}".format(cur.statusmessage))
+        logging.debug(f"create_accounts(): status message: {cur.statusmessage}")
     conn.commit()
 
 
 def print_balances(conn):
     with conn.cursor() as cur:
         cur.execute("SELECT id, balance FROM accounts")
-        logging.debug("print_balances(): status message: {}".format(cur.statusmessage))
+        logging.debug(f"print_balances(): status message: {cur.statusmessage}")
         rows = cur.fetchall()
         conn.commit()
-        print("Balances at {}".format(time.asctime()))
+        print(f"Balances at {time.asctime()}")
         for row in rows:
             print([str(cell) for cell in row])
 
@@ -29,7 +29,7 @@ def print_balances(conn):
 def delete_accounts(conn):
     with conn.cursor() as cur:
         cur.execute("DELETE FROM bank.accounts")
-        logging.debug("delete_accounts(): status message: {}".format(cur.statusmessage))
+        logging.debug(f"delete_accounts(): status message: {cur.statusmessage}")
     conn.commit()
 
 
@@ -43,7 +43,7 @@ def run_transaction(conn, op):
         while True:
             retries +=1
             if retries == max_retries:
-                err_msg = "Transaction did not succeed after {} retries".format(max_retries)
+                err_msg = f"Transaction did not succeed after {max_retries} retries"
                 raise ValueError(err_msg)
 
             try:
@@ -53,7 +53,7 @@ def run_transaction(conn, op):
                 # from the retry loop.
                 break
             except psycopg2.Error as e:
-                logging.debug("e.pgcode: {}".format(e.pgcode))
+                logging.debug(f"e.pgcode: {e.pgcode}")
                 if e.pgcode == '40001':
                     # This is a retry error, so we roll back the current
                     # transaction and sleep for a bit before retrying. The
@@ -61,7 +61,7 @@ def run_transaction(conn, op):
                     conn.rollback()
                     logging.debug("EXECUTE SERIALIZATION_FAILURE BRANCH")
                     sleep_ms = (2**retries) * 0.1 * (random.random() + 0.5)
-                    logging.debug("Sleeping {} seconds".format(sleep_ms))
+                    logging.debug(f"Sleeping {sleep_ms} seconds")
                     time.sleep(sleep_ms)
                     continue
                 else:
@@ -78,17 +78,18 @@ def test_retry_loop(conn):
         # force_retry() statement isn't the first one.
         cur.execute('SELECT now()')
         cur.execute("SELECT crdb_internal.force_retry('1s'::INTERVAL)")
-    logging.debug("test_retry_loop(): status message: {}".format(cur.statusmessage))
+    logging.debug(f"test_retry_loop(): status message: {cur.statusmessage}")
 
 
 def transfer_funds(conn, frm, to, amount):
     with conn.cursor() as cur:
 
         # Check the current balance.
-        cur.execute("SELECT balance FROM accounts WHERE id = " + str(frm))
+        cur.execute(f"SELECT balance FROM accounts WHERE id = {str(frm)}")
         from_balance = cur.fetchone()[0]
         if from_balance < amount:
-            err_msg = "Insufficient funds in account {}: have {}, need {}".format(frm, from_balance, amount)
+            err_msg = f"Insufficient funds in account {frm}: have {from_balance}, need {amount}"
+
             raise RuntimeError(err_msg)
 
         # Perform the transfer.
@@ -97,7 +98,7 @@ def transfer_funds(conn, frm, to, amount):
         cur.execute("UPDATE accounts SET balance = balance + %s WHERE id = %s",
                     (amount, to))
     conn.commit()
-    logging.debug("transfer_funds(): status message: {}".format(cur.statusmessage))
+    logging.debug(f"transfer_funds(): status message: {cur.statusmessage}")
 
 
 def main():
@@ -137,9 +138,7 @@ def main():
         # Below, we print the error and continue on so this example is easy to
         # run (and run, and run...).  In real code you should handle this error
         # and any others thrown by the database interaction.
-        logging.debug("run_transaction(conn, op) failed: {}".format(ve))
-        pass
-
+        logging.debug(f"run_transaction(conn, op) failed: {ve}")
     print_balances(conn)
 
     delete_accounts(conn)

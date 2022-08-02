@@ -40,20 +40,19 @@ def median(lst):
     else:
         return sum(sorted(lst)[n//2-1:n//2+1])/2.0
 
-times = list()
+times = []
 for n in range(args.repeat):
     start = time.time()
     statement = args.statement
     cur.execute(statement)
-    if n < 1:
-        if cur.description is not None:
-            colnames = [desc[0] for desc in cur.description]
-            print("")
-            print("Result:")
-            print(colnames)
-            rows = cur.fetchall()
-            for row in rows:
-                print([str(cell) for cell in row])
+    if n < 1 and cur.description is not None:
+        colnames = [desc[0] for desc in cur.description]
+        print("")
+        print("Result:")
+        print(colnames)
+        rows = cur.fetchall()
+        for row in rows:
+            print([str(cell) for cell in row])
     end = time.time()
     times.append((end - start)* 1000)
 

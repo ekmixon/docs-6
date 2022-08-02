@@ -47,7 +47,7 @@ def transfer_funds(txn, frm, to, amount):
     with txn.cursor() as cur:
 
         # Check the current balance.
-        cur.execute("SELECT balance FROM accounts WHERE id = " + str(frm))
+        cur.execute(f"SELECT balance FROM accounts WHERE id = {str(frm)}")
         from_balance = cur.fetchone()[0]
         if from_balance < amount:
             raise "Insufficient funds"

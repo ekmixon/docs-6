@@ -52,8 +52,8 @@ def create_random_accounts(sess, num):
     new IDs do not collide with existing IDs.
     """
     new_accounts = []
+    billion = 1000000000
     while num > 0:
-        billion = 1000000000
         new_id = floor(random.random()*billion)
         seen_account_ids.add(new_id)
         new_accounts.append(
@@ -73,8 +73,7 @@ run_transaction(sessionmaker(bind=engine),
 def get_random_account_id():
     """ Helper function for getting random existing account IDs.
     """
-    random_id = random.choice(tuple(seen_account_ids))
-    return random_id
+    return random.choice(tuple(seen_account_ids))
 
 
 def transfer_funds_randomly(session):

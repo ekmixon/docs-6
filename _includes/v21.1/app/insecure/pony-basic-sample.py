@@ -44,8 +44,7 @@ create_random_accounts(100)
 
 
 def get_random_account_id():
-    id = random.choice(tuple(seen_account_ids))
-    return id
+    return random.choice(tuple(seen_account_ids))
 
 
 @db_session(retry=10)  # retry of the optimistic transaction
