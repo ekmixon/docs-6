@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "front-matter": "^4.0.2",
-    "redoc-cli": "^0.11.4",
+    "redoc-cli": "^0.13.21",
     "snippet-enricher-cli": "^0.0.8",
     "swagger2openapi": "^7.0.5",
     "yaml": "^1.10.2"
