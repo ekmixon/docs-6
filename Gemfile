@@ -5,13 +5,13 @@ source "https://rubygems.org"
 # docs-builder Docker image to keep things speedy in CI. See ci/README.md for
 # instructions.
 
-gem "jekyll", "~> 4.2"
-gem "jekyll-redirect-from", "~> 0.15"
+gem "jekyll", "~> 4.2", ">= 4.2.0"
+gem "jekyll-redirect-from", "~> 0.15", ">= 0.15.0"
 gem "liquid-c", "~> 4.0.0"
 gem "redcarpet", "~> 3.5"
 gem "rss"
 gem "sassc", "~> 2.2"
-gem "webrick"
+gem "webrick", ">= 1.5.1"
 
 group :jekyll_plugins do
     gem "jekyll-include-cache"
