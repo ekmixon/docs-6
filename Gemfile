@@ -11,7 +11,7 @@ gem "liquid-c", "~> 4.0.0"
 gem "redcarpet", "~> 3.5"
 gem "rss"
 gem "sassc", "~> 2.2"
-gem "webrick"
+gem "webrick", ">= 1.8.2"
 
 group :jekyll_plugins do
     gem "jekyll-include-cache"
